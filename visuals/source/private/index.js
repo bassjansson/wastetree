@@ -1,7 +1,4 @@
-const server = require('../main/server.js');
-const clients = require('../main/clients.js')(server);
-const Arduino = require('../main/arduino.js');
-const sensors = new Arduino('/dev/rfcomm0');
+// Global variables
 
 var canvas;
 var canvasRatio;
@@ -14,6 +11,27 @@ var perspectiveMatrix;
 
 var inputUniform;
 var inputValue;
+
+var numberOfCups = 0;
+
+
+// TODO: Server setup
+
+//const server = require('../main/server.js');
+//const clients = require('../main/clients.js')(server);
+
+
+// Sensor data handling
+
+const Arduino = require('../main/arduino.js');
+const sensors = new Arduino('/dev/rfcomm0');
+
+sensors.receiveSensorData(sensorData =>
+{
+    if (sensorData.data[0])
+        numberOfCups++;
+});
+
 
 // Mouse and touch event handling
 
@@ -190,7 +208,7 @@ function drawScene()
 
     // Update input value (comment out to use mouse)
 
-    inputValue = [Math.sin(Date.now() / 1100.0), Math.cos(Date.now() / 1300.0)];
+    inputValue = [Math.sin(Date.now() / 2900.0) * 0.2 + 0.9, Math.cos(Date.now() / 3300.0) * 0.1 - 0.8];
 
     // Set the shader uniforms
 
