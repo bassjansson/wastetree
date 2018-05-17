@@ -1,0 +1,24 @@
+{
+    "name": "waste-tree",
+    "version": "1.0.0",
+    "description": "Accelerating the transition towards a Circular Economy",
+    "author": "Bass Jansson",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bassjansson/wastetree"
+    },
+    "main": "source/main/main.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "dependencies": {
+        "express": "^4.16.2",
+        "socket.io": "^2.0.4",
+        "serialport": "^6.0.4"
+    },
+    "devDependencies": {
+        "electron": "^1.7.8",
+        "electron-rebuild": "^1.6.0"
+    }
+}
