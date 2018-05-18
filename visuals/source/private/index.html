@@ -89,7 +89,7 @@
 
             void main(void)
             {
-                vec2 a = vPosition * 0.5 + vec2(0.0, 0.9);
+                vec2 a = vPosition * 0.8 + vec2(0.0, 0.9);
                 vec2 z = uInput;
 
                 float value = 1.0;
@@ -111,7 +111,7 @@
                 // gl_FragColor = vec4(hsv2rgb(vec3(1.0 - zHue, 1.0, zVal)), 1.0);
 
                 // Purple sides with green/yellow center
-                vec4 color1 = vec4(value * cArg(z), value, value * cAbs(z), 1.0);
+                vec4 color1 = vec4(value * cArg(z) * 1.25, value, value * cAbs(z), 1.0);
 
                 // Green blob with white dots
                 float za = cAbs(z) * 0.5;

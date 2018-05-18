@@ -37,7 +37,9 @@ sensors.receiveSensorData(sensorData =>
 {
     if (sensorData.data[0])
     {
-        numberOfCups++;
+        if (numberOfCups < 30)
+            numberOfCups++;
+
         lastCupTime = Date.now();
     }
 });
@@ -81,9 +83,10 @@ function start()
     // Slowly decrease numberOfCups
     setInterval(() =>
     {
-        if (numberOfCups > 1.0)
+        if (numberOfCups > 1)
             --numberOfCups;
-        console.log("decreased: ", numberOfCups);
+
+        //console.log("decreased: ", numberOfCups);
     }, 10000);
 
     // Init input value
@@ -100,7 +103,9 @@ function start()
     // {
     //     console.log("clicked canvas!");
     //
-    //     numberOfCups++;
+    //     if (numberOfCups < 30)
+    //         numberOfCups++;
+    //
     //     lastCupTime = Date.now();
     // };
 
@@ -240,9 +245,7 @@ function drawScene()
     var maxTime = 30000;
 
     // Get modulation
-    var mod1 = numberOfCups / 30.0 * 9.0 + 1.0;
-    if (mod1 > 10.0)
-        mod1 = 10.0;
+    var mod1 = numberOfCups / 30.0 * 20.0 + 1.0;
 
     var mod2 = (Date.now() - lastCupTime) / maxTime;
     if (mod2 > 1.0)
@@ -252,8 +255,8 @@ function drawScene()
 
 
     // Get
-    phases[0] = (phases[0] + 0.0011 * mod1) % 1.0;
-    phases[1] = (phases[1] + 0.0013 * mod1) % 1.0;
+    phases[0] = (phases[0] + 0.0005 * mod1) % 1.0;
+    phases[1] = (phases[1] + 0.0007 * mod1) % 1.0;
 
     inputValue = [Math.sin(phases[0] * 2.0 * Math.PI) * 0.3 + 0.9, Math.cos(phases[1] * 2.0 * Math.PI) * 0.2 - 0.8];
     colorMod = [modTime, mod1 / 10.0];
