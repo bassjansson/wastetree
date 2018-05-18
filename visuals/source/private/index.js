@@ -11,8 +11,11 @@ var perspectiveMatrix;
 
 var inputUniform;
 var inputValue;
+var colorMod;
+var colorModUniform;
 
-var numberOfCups = 0;
+var phases = [0.0, 0.0];
+var modTime = 0.0;
 
 
 // TODO: Server setup
@@ -26,10 +29,17 @@ var numberOfCups = 0;
 const Arduino = require('../main/arduino.js');
 const sensors = new Arduino('/dev/rfcomm0');
 
+var numberOfCups = 0;
+var lastCupTime = Date.now();
+var lastResetTime = Date.now();
+
 sensors.receiveSensorData(sensorData =>
 {
     if (sensorData.data[0])
+    {
         numberOfCups++;
+        lastCupTime = Date.now();
+    }
 });
 
 
@@ -68,6 +78,14 @@ function setMenuCoordinate(x, y)
 //
 function start()
 {
+    // Slowly decrease numberOfCups
+    setInterval(() =>
+    {
+        if (numberOfCups > 1.0)
+            --numberOfCups;
+        console.log("decreased: ", numberOfCups);
+    }, 10000);
+
     // Init input value
 
     inputValue = [0.0, 0.0];
@@ -76,6 +94,15 @@ function start()
 
     canvas = document.getElementById("glCanvas");
     canvasRatio = canvas.height / canvas.width;
+
+    // TODO: for debugging
+    // canvas.onclick = () =>
+    // {
+    //     console.log("clicked canvas!");
+    //
+    //     numberOfCups++;
+    //     lastCupTime = Date.now();
+    // };
 
     // Add mouse event listeners
 
@@ -206,13 +233,36 @@ function drawScene()
     gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
     gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 
+
     // Update input value (comment out to use mouse)
 
-    inputValue = [Math.sin(Date.now() / 2900.0) * 0.2 + 0.9, Math.cos(Date.now() / 3300.0) * 0.1 - 0.8];
+    var maxCups = 30;
+    var maxTime = 30000;
+
+    // Get modulation
+    var mod1 = numberOfCups / 30.0 * 9.0 + 1.0;
+    if (mod1 > 10.0)
+        mod1 = 10.0;
+
+    var mod2 = (Date.now() - lastCupTime) / maxTime;
+    if (mod2 > 1.0)
+        mod2 = 1.0;
+
+    modTime = modTime * 0.95 + (1.0 - mod2) * 0.05;
+
+
+    // Get
+    phases[0] = (phases[0] + 0.0011 * mod1) % 1.0;
+    phases[1] = (phases[1] + 0.0013 * mod1) % 1.0;
+
+    inputValue = [Math.sin(phases[0] * 2.0 * Math.PI) * 0.3 + 0.9, Math.cos(phases[1] * 2.0 * Math.PI) * 0.2 - 0.8];
+    colorMod = [modTime, mod1 / 10.0];
+
 
     // Set the shader uniforms
 
     gl.uniform2fv(inputUniform, inputValue);
+    gl.uniform2fv(colorModUniform, colorMod);
 
     // Draw the square.
 
@@ -252,6 +302,7 @@ function initShaders()
     // Get the locations of the uniforms
 
     inputUniform = gl.getUniformLocation(shaderProgram, "uInput");
+    colorModUniform = gl.getUniformLocation(shaderProgram, "uColorMod");
 }
 
 //

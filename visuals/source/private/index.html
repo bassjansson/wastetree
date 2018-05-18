@@ -36,7 +36,7 @@
         <!-- Fragment shader program -->
         <script id="shader-fs" type="x-shader/x-fragment">
 
-            #define ITERATIONS 15
+            #define ITERATIONS 10
             #define MINIMUM 0.000001
 
             precision mediump float; // mediump or highp?
@@ -44,6 +44,7 @@
             varying vec2 vPosition;
 
             uniform vec2 uInput;
+            uniform vec2 uColorMod;
 
             vec2 cMul(vec2 a, vec2 b)
             {
@@ -110,21 +111,23 @@
                 // gl_FragColor = vec4(hsv2rgb(vec3(1.0 - zHue, 1.0, zVal)), 1.0);
 
                 // Purple sides with green/yellow center
-                //gl_FragColor = vec4(value * cArg(z), value, value * cAbs(z), 1.0);
+                vec4 color1 = vec4(value * cArg(z), value, value * cAbs(z), 1.0);
 
                 // Green blob with white dots
                 float za = cAbs(z) * 0.5;
-                gl_FragColor = vec4(value * 0.8 - za, value - za * 0.2, value * 0.4 - za, 1.0) + 0.15;
+                vec4 color2 = vec4(value * 0.8 - za, value - za * 0.2, value * 0.4 - za, 1.0) + 0.15;
 
                 // Black hole with green walls
                 //gl_FragColor = vec4(hsv2rgb(vec3(cAbs(z) * 0.1 + 0.2, 1.0, 1.0 - value)), 1.0);
+
+                gl_FragColor = color1 * uColorMod.x + color2 * (1.0 - uColorMod.x);
             }
 
         </script>
     </head>
 
     <body onload="start()">
-        <canvas id="glCanvas" width=1024 height=1024>
+        <canvas id="glCanvas" width=512 height=512>
             Your browser doesn't appear to support the <code>&lt;canvas&gt;</code> element.
         </canvas>
     </body>
